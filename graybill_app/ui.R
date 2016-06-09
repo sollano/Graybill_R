@@ -42,7 +42,11 @@ shinyUI(
       
       actionButton("Load", "Load the File"),
       
+      #checkboxGroupInput("show_vars", "Variable:", choices = names(raw_data), selected = names(raw_data)),
+      
+      selectInput('columns', 'Columns', ""),
     
+      
       width = 3 ), 
     
     mainPanel(

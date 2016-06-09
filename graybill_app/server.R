@@ -3,7 +3,23 @@ library(ggplot2)
 library(DT)
 
 
-shinyServer( function(input, output) {
+shinyServer( function(input, output,session) {
+  
+  outVar <- reactive({
+    
+    if(input$Load == 0){return()}
+    inFile <- input$file1
+    if (is.null(inFile)){return(NULL)}
+    
+    mydata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
+    
+    names(mydata)
+  })  
+  
+  observe({
+    updateSelectInput(session, "columns",
+                      choices = outVar()
+    )})
   
   
   newData <- reactive({
