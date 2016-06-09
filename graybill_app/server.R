@@ -17,8 +17,8 @@ shinyServer( function(input, output,session) {
   })  
   
   observe({
-    updateSelectInput(session, "columns",
-                      choices = outVar()
+    updateCheckboxGroupInput(session, "columns",
+                             choices = outVar()
     )})
   
   
