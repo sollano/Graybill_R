@@ -38,14 +38,18 @@ shinyUI(
                    choices=c(Nenhuma='',Simples="'",Dupla= '"'),
                    selected='"'),
       
-      tags$hr()
+      tags$hr(),
       
-    ), 
+      actionButton("Load", "Load the File"),
+      
+    
+      width = 3 ), 
     
     mainPanel(
       withMathJax(),
       uiOutput("formula"),
       tabsetPanel(
+        tabPanel("Dados", dataTableOutput("data")),
         tabPanel("Grafico", plotOutput("plot")), 
         tabPanel("Resultado", tableOutput("tabgraybill"))
       )

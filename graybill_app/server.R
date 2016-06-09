@@ -1,15 +1,32 @@
 library(shiny)
 library(ggplot2)
+library(DT)
 
-shinyServer( function(input, output) 
-{
+
+shinyServer( function(input, output) {
   
-  output$formula <- renderUI({
+  
+  newData <- reactive({
+    if(input$Load == 0){return()}
+    inFile <- input$file1
+    if (is.null(inFile)){return(NULL)}
     
-    withMathJax(
-      h3("$$ F(H_{0})=\\frac{(\\hat{\\beta}-\\theta)'(Y'_{1} Y_{1})(\\hat{\\beta}-\\theta)}{2QMRes}  \\sim F_\\alpha (2,n-2 \\phantom{1}g.l.) $$")
-    )
+    isolate({ 
+      input$Load
+      raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
+      
+      subset_data <- raw_data
+      #subset_data <- raw_data_[, input$show_vars, drop = FALSE]
+      
+          })
+    subset_data
+  })
+ 
+  output$data <- renderDataTable({
     
+    data <- newData()
+    datatable(data)
+   
   })
   
   output$tabgraybill <- renderTable({
@@ -121,6 +138,19 @@ shinyServer( function(input, output)
     
   })
   
+  output$formula <- renderUI({
+    
+    withMathJax(
+      h3("$$ F(H_{0})=\\frac{(\\hat{\\beta}-\\theta)'(Y'_{1} Y_{1})(\\hat{\\beta}-\\theta)}{2QMRes}  \\sim F_\\alpha (2,n-2 \\phantom{1}g.l.) $$")
+    )
+    
+  })
   
-}
-)
+  
+  
+  
+  
+  })
+  
+
+  
