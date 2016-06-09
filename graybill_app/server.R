@@ -1,6 +1,5 @@
 library(shiny)
 library(ggplot2)
-library(DT)
 
 shinyServer( function(input, output) 
 {
