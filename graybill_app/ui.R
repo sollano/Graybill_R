@@ -19,8 +19,6 @@ shinyUI(
         
         accept=c('text/csv', 'text/comma-separated-values,text/plain', '.csv')),
       
-      helpText("As colunas devem ser obrigatoriamente nomeadas 'Y1' e 'Yj', para valores Padrao e Proposto, respectivamente "),
-      
       tags$hr(),
       
       radioButtons(inputId='sep', 
@@ -42,12 +40,17 @@ shinyUI(
       
       actionButton("Load", "Load the File"),
       
-      actionButton("rename", "Renomear"),
+      checkboxGroupInput('columns', "Selecione as variaveis:", "", ""),
       
-      actionButton("changeorder", "Inverter ordem?"),
+      helpText("As colunas devem ser obrigatoriamente nomeadas 'Y1' e 'Yj', para valores Padrao e Proposto, respectivamente "),
+      
+      helpText("Para renomear as colunas, clique nos botoes abaixo:"),
+      
+      actionButton("rename", "Y1 Yj"),
+      
+      actionButton("changeorder", "Yj Y1"),
       
       
-      checkboxGroupInput('columns', "Variable:", "", ""),
       
       #checkboxInput("changeorder", "Inverter ordem?"),
       
