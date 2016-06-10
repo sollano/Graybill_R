@@ -26,3 +26,12 @@ server = function(input, output) {
   output$my_output_data <- renderTable({data1()},include.rownames=FALSE)  
   
 }
+
+
+
+
+if(input$changeorder == F)
+{names(dados) <- c("Y1, Yj")}
+else(names(dados) <- c("Yj, Y1") )
+
+
