@@ -21,13 +21,10 @@ shinyServer( function(input, output,session) {
                              choices = outVar()
     )})
   
-  
   newData <- reactive({
     if(input$Load == 0){return()}
     inFile <- input$file1
     if (is.null(inFile)){return(NULL)}
-    
-  #  isolate({ })
     
     input$Load
     raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
@@ -48,10 +45,9 @@ shinyServer( function(input, output,session) {
  
   output$data <- renderDataTable({
     
-    data <- newData()
+  data <- newData()
     
-    
-    datatable(data)
+  datatable(data)
    
   })
   
@@ -62,14 +58,7 @@ shinyServer( function(input, output,session) {
     # 'size', 'type', e 'datapath' . A coluna 'datapath' 
     # ira conter os nomes dos arquivos locais onde o dado pode ser encontrado
     
-    #inFile <- input$file1
-    
-    #if (is.null(inFile))
-      #return(NULL)
-    
-    #dados <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec, quote=input$quote)
-    
-    dados <- newData()
+      dados <- newData()
     
     
     # 2) Calculo do FH0, F Critico e p-valor ####
@@ -175,9 +164,6 @@ shinyServer( function(input, output,session) {
     )
     
   })
-  
-  
-  
   
   
   })
