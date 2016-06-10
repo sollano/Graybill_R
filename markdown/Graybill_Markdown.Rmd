@@ -12,11 +12,11 @@ $$ F(H_{0})=\frac{(\hat{\beta}-\theta)'(Y'_{1} Y_{1})(\hat{\beta}-\theta)}{2QMRe
 
 ```{r, include = FALSE}
 
-require(xlsx)
+require(readxl)
 require(ggplot2)
 require(pander)
 
-dados <- read.xlsx("D:/Documents/Trabalhos_Mensuracao/Scrips,Funcoes,Planilhas_automaticas/Graybill_R/dados_graybill.xlsx", sheetName = "graybill", header = TRUE)
+dados <- read_excel("D:/Documents/Trabalhos_Mensuracao/Scrips,Funcoes,Planilhas_automaticas/Graybill_R/graybill_dados.xlsx", sheet = "graybill")
 dados$er <- round(((dados$Yj - dados$Y1)/dados$Y1)*100, 2)
 fit <- lm(Yj ~ Y1, dados)
 
