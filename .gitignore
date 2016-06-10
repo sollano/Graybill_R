@@ -5,6 +5,7 @@ graybill_dados2.csv
 graybill_dados.xlsx
 documents
 Graybill_R.Rproj
+graybill_app/rsconnect
 
 # History files
 .Rhistory
