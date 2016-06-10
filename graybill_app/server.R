@@ -1,15 +1,54 @@
 library(shiny)
 library(ggplot2)
+library(DT)
 
-shinyServer( function(input, output) 
-{
+
+shinyServer( function(input, output,session) {
   
-  output$formula <- renderUI({
+  outVar <- reactive({
     
-    withMathJax(
-      h3("$$ F(H_{0})=\\frac{(\\hat{\\beta}-\\theta)'(Y'_{1} Y_{1})(\\hat{\\beta}-\\theta)}{2QMRes}  \\sim F_\\alpha (2,n-2 \\phantom{1}g.l.) $$")
-    )
+    if(input$Load == 0){return()}
+    inFile <- input$file1
+    if (is.null(inFile)){return(NULL)}
     
+    mydata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
+    
+    names(mydata)
+  })  
+  
+  observe({
+    updateCheckboxGroupInput(session, "columns",
+                             choices = outVar()
+    )})
+  
+  newData <- reactive({
+    if(input$Load == 0){return()}
+    inFile <- input$file1
+    if (is.null(inFile)){return(NULL)}
+    
+    input$Load
+    raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
+    
+    subset_data <- raw_data
+    subset_data <- raw_data[, input$columns]
+    
+    
+    if(input$rename)
+    {colnames(subset_data) <- c("Y1", "Yj") }
+    
+    if(input$changeorder)
+    {colnames(subset_data) <- c("Yj", "Y1") }
+    
+    subset_data
+    
+  })
+ 
+  output$data <- renderDataTable({
+    
+  data <- newData()
+    
+  datatable(data)
+   
   })
   
   output$tabgraybill <- renderTable({
@@ -19,13 +58,7 @@ shinyServer( function(input, output)
     # 'size', 'type', e 'datapath' . A coluna 'datapath' 
     # ira conter os nomes dos arquivos locais onde o dado pode ser encontrado
     
-    inFile <- input$file1
-    
-    if (is.null(inFile))
-      return(NULL)
-    
-    dados <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec, 
-                      quote=input$quote)
+      dados <- newData()
     
     
     # 2) Calculo do FH0, F Critico e p-valor ####
@@ -100,13 +133,16 @@ shinyServer( function(input, output)
   
   output$plot <- renderPlot({
     
-    inFile <- input$file1
+   # inFile <- input$file1
     
-    if (is.null(inFile))
-      return(NULL)
+   # if (is.null(inFile))
+     # return(NULL)
     
-    dados <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec, 
-                      quote=input$quote)
+   # dados <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec, quote=input$quote)
+    
+    dados <- newData()
+    
+
     
     ggplot(data = dados, aes(x = Y1, y = Yj)) +
       geom_point(aes(), size = 3) +
@@ -121,6 +157,16 @@ shinyServer( function(input, output)
     
   })
   
+  output$formula <- renderUI({
+    
+    withMathJax(
+      h3("$$ F(H_{0})=\\frac{(\\hat{\\beta}-\\theta)'(Y'_{1} Y_{1})(\\hat{\\beta}-\\theta)}{2QMRes}  \\sim F_\\alpha (2,n-2 \\phantom{1}g.l.) $$")
+    )
+    
+  })
   
-}
-)
+  
+  })
+  
+
+  
