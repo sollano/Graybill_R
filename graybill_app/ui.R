@@ -42,7 +42,14 @@ shinyUI(
       
       actionButton("Load", "Load the File"),
       
-      checkboxGroupInput('columns', "Variable:", ""),
+      actionButton("rename", "Renomear"),
+      
+      actionButton("changeorder", "Inverter ordem?"),
+      
+      
+      checkboxGroupInput('columns', "Variable:", "", ""),
+      
+      #checkboxInput("changeorder", "Inverter ordem?"),
       
       #selectInput('columns', 'Columns', ""),
     

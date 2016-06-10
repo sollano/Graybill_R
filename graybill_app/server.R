@@ -27,20 +27,30 @@ shinyServer( function(input, output,session) {
     inFile <- input$file1
     if (is.null(inFile)){return(NULL)}
     
-    isolate({ 
-      input$Load
-      raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
-      
-      subset_data <- raw_data
-      #subset_data <- raw_data_[, input$show_vars, drop = FALSE]
-      
-          })
+  #  isolate({ })
+    
+    input$Load
+    raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
+    
+    subset_data <- raw_data
+    subset_data <- raw_data[, input$columns]
+    
+    
+    if(input$rename)
+    {colnames(subset_data) <- c("Y1", "Yj") }
+    
+    if(input$changeorder)
+    {colnames(subset_data) <- c("Yj", "Y1") }
+    
     subset_data
+    
   })
  
   output$data <- renderDataTable({
     
     data <- newData()
+    
+    
     datatable(data)
    
   })
@@ -52,13 +62,14 @@ shinyServer( function(input, output,session) {
     # 'size', 'type', e 'datapath' . A coluna 'datapath' 
     # ira conter os nomes dos arquivos locais onde o dado pode ser encontrado
     
-    inFile <- input$file1
+    #inFile <- input$file1
     
-    if (is.null(inFile))
-      return(NULL)
+    #if (is.null(inFile))
+      #return(NULL)
     
-    dados <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec, 
-                      quote=input$quote)
+    #dados <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec, quote=input$quote)
+    
+    dados <- newData()
     
     
     # 2) Calculo do FH0, F Critico e p-valor ####
@@ -133,13 +144,16 @@ shinyServer( function(input, output,session) {
   
   output$plot <- renderPlot({
     
-    inFile <- input$file1
+   # inFile <- input$file1
     
-    if (is.null(inFile))
-      return(NULL)
+   # if (is.null(inFile))
+     # return(NULL)
     
-    dados <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec, 
-                      quote=input$quote)
+   # dados <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec, quote=input$quote)
+    
+    dados <- newData()
+    
+
     
     ggplot(data = dados, aes(x = Y1, y = Yj)) +
       geom_point(aes(), size = 3) +
