@@ -19,7 +19,7 @@ shinyUI(
       fileInput(
         inputId = "file1",
         
-        label = "Selecione o arquivo .csv",
+        label = "Selecione o arquivo .csv ou .txt",
         
         accept=c('text/csv', 'text/comma-separated-values,text/plain', '.csv')),
       
