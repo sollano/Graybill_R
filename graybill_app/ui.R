@@ -1,5 +1,6 @@
 library(shiny)
 library(DT)
+library(markdown)
 #library(shinythemes)
 
 shinyUI(
@@ -59,9 +60,11 @@ shinyUI(
       uiOutput("formula"),
       
       tabsetPanel(
-        tabPanel("Dados", dataTableOutput("data")),
+        tabPanel("Creditos", includeMarkdown("credit.md") )  ,
+        tabPanel("Dados",value = "A" ,dataTableOutput("data")),
         tabPanel("Grafico", plotOutput("plot")), 
-        tabPanel("Resultado", tableOutput("tabgraybill"))
+        tabPanel("Resultado", tableOutput("tabgraybill")
+               )
       )
     )
   )
