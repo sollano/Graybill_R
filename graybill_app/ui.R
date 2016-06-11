@@ -11,8 +11,7 @@ shinyUI(
   theme = "bootstrap.css",
   
   titlePanel("Teste F de Graybill"),
-  
-  
+
   sidebarLayout(
     
     sidebarPanel(
@@ -34,13 +33,7 @@ shinyUI(
                    choices=c(Ponto=".", Virgula=","),
                    selected=","),
       
-     # radioButtons(inputId='quote',label='Aspas',choices=c(Nenhuma='',Simples="'",Dupla= '"'), selected='"'),
-      
-     # tags$hr(),
-      
-      actionButton("Load", "Carregue o arquivo"),
-      
-      #checkboxGroupInput('columns', "Selecione as variaveis:", ""),
+     actionButton("Load", "Carregue o arquivo"),
       
      helpText("As colunas devem ser obrigatoriamente nomeadas 'Y1' e 'Yj', para valores Padrao e Proposto, respectivamente."),
      
@@ -60,12 +53,17 @@ shinyUI(
       uiOutput("formula"),
       
       tabsetPanel(
-        tabPanel("Creditos", includeMarkdown("credit.md") )  ,
-        tabPanel("Dados",value = "A" ,dataTableOutput("data")),
-        tabPanel("Grafico", plotOutput("plot")), 
-        tabPanel("Resultado", tableOutput("tabgraybill")
-               )
+        id = "tabs",
+        tabPanel("Dados",     dataTableOutput("data"))        ,
+        tabPanel("Grafico",   plotOutput("plot"))             , 
+        tabPanel("Resultado", tableOutput("tabgraybill"))     ,
+        tabPanel("Creditos",  includeMarkdown("credit.md") )  ,
+        
+        selected = "Dados"
+                 
+               
       )
+      
     )
   )
   
