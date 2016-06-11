@@ -33,24 +33,27 @@ shinyUI(
                    choices=c(Ponto=".", Virgula=","),
                    selected=","),
       
-      radioButtons(inputId='quote', 
-                   label='Aspas',
-                   choices=c(Nenhuma='',Simples="'",Dupla= '"'),
-                   selected='"'),
+     # radioButtons(inputId='quote',label='Aspas',choices=c(Nenhuma='',Simples="'",Dupla= '"'), selected='"'),
       
      # tags$hr(),
       
       actionButton("Load", "Carregue o arquivo"),
       
-      checkboxGroupInput('columns', "Selecione as variaveis:", ""),
+      #checkboxGroupInput('columns', "Selecione as variaveis:", ""),
       
-      helpText("As colunas devem ser obrigatoriamente nomeadas 'Y1' e 'Yj', para valores Padrao e Proposto, respectivamente."),
-      
-      helpText("Para renomear as colunas, clique em um dos botoes abaixo:"),
-      
-      actionButton("rename", "Y1 Yj"),
-      
-      actionButton("changeorder", "Yj Y1"),
+     helpText("As colunas devem ser obrigatoriamente nomeadas 'Y1' e 'Yj', para valores Padrao e Proposto, respectivamente."),
+     
+     helpText("Para filtrar as colunas,  selecione as variaveis e clique no botao abaixo:"),
+     
+     selectizeInput(
+       'columns', "selecione as variaveis:", choices = "",
+       multiple = TRUE, options = list(maxItems = 2)  ),
+
+     actionButton("subset", "Filtrar"),
+
+     helpText("Para renomear as colunas, clique no botao abaixo:"),
+
+     actionButton("rename", "Renomear"),
       
       width = 3 ), 
     

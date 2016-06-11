@@ -9,7 +9,7 @@ shinyServer( function(input, output,session) {
     
     if(input$Load == 0){return()}
     inFile <- input$file1
-    if (is.null(inFile)){return(NULL)}
+    if(is.null(inFile)){return(NULL)}
     
     mydata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
     
@@ -17,9 +17,9 @@ shinyServer( function(input, output,session) {
   })  
   
   observe({
-    updateCheckboxGroupInput(session, "columns",
-                             choices = outVar()
-    )})
+    #updateCheckboxGroupInput(session, "columns", choices = outVar())
+    updateSelectizeInput(session,"columns",choices = outVar())
+    })
   
   newData <- reactive({
     if(input$Load == 0){return()}
@@ -27,17 +27,15 @@ shinyServer( function(input, output,session) {
     if (is.null(inFile)){return(NULL)}
     
     input$Load
-    raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
+    raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote='"')
     
     subset_data <- raw_data
-    subset_data <- raw_data[, input$columns]
-    
+
+    if(input$subset)
+    {subset_data <- raw_data[, input$columns] }
     
     if(input$rename)
     {colnames(subset_data) <- c("Y1", "Yj") }
-    
-    if(input$changeorder)
-    {colnames(subset_data) <- c("Yj", "Y1") }
     
     subset_data
     
