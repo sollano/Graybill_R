@@ -2,62 +2,83 @@ library(shiny)
 library(ggplot2)
 library(DT)
 
-shinyServer( function(input, output,session) {
+shinyServer( function(input, output,session) { # como estamos usando reactive, cria-se session
   
-  outVar <- reactive({
+  outVar <- reactive({ # iremos salvar os nomes das variaveis do objeto carregado em uma funcao reativa
     
-    if(input$Load == 0){return()}
-    inFile <- input$file1
-    if(is.null(inFile)){return(NULL)}
+    if(input$Load == 0){return()} # se o botao load nao for pressionado, retornar nada
+    inFile <- input$file1 
+    if(is.null(inFile)){return(NULL)} # se o arquivo nao for carregado, retornar null
     
+    # Carregar o arquivo com base em input
     mydata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
     
-    names(mydata)
+    names(mydata) # nomes das variaveis do arquivo carregado
   })  
   
-  observe({
-    #updateCheckboxGroupInput(session, "columns", choices = outVar())
-    updateSelectizeInput(session,"columns",choices = outVar())
+  observe({ # Com observe iremos atualizar a lista de variaveis em selectizeInput
+
+      updateSelectizeInput( # funcao que atualiza um SelectizeInput
+      session, # sessao
+      "columns", # Id do SelecizeInput que sera atualizado
+      choices = outVar()) # lista de opcoes. No caso, nomes das variaveis do arquivo carregado pelo usuario
     })
   
-  newData <- reactive({
-    if(input$Load == 0){return()}
-    inFile <- input$file1
-    if (is.null(inFile)){return(NULL)}
+  newData <- reactive({ # Criamos uma nova funcao reactive. este sera o objeto filtrado, utilizado nos calculos
     
-    input$Load
-    raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote='"')
-    
-    subset_data <- raw_data
+    if(input$Load==0){return()} # se o botao load nao for pressionado(==0), retornar nada
+    else(inFile <- input$file1) # caso contrario, salvar o caminho do arquivo carregado em inFile
 
-    if(input$subset)
-    {
-    subset_data <- raw_data[, input$columns]
-    colnames(subset_data) <- c("Y1", "Yj")  }
-    
-    subset_data
-    
-  })
- 
-  output$data <- renderDataTable({
-    
-  data <- newData()
-    
-  datatable(data)
-   
-  })
-  
-  output$tabgraybill <- renderTable({
-    
     # input$file1 sera NULL inicialmente. apos o usuario selecionar
     # e upar um arquivo, ele sera um data frame com as colunas
     # 'size', 'type', e 'datapath' . A coluna 'datapath' 
     # ira conter os nomes dos arquivos locais onde o dado pode ser encontrado
     
-      dados <- newData()
+    if (is.null(inFile)){return(NULL)} # se o arquivo nao for carregado, retornar null
+    else(raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote='"') )
+    # Carregamos o arquivo em um objeto
+
+    subset_data <- raw_data # Criamos uma copia do arquivo
+    # este sera mostrado enquanto o usuario nao seleciona colunas com input$columns
+
+    if(input$subset) # se o botao input#subset for apertado
+    {
+    subset_data <- raw_data[, input$columns] # filtar colunas com base em input$columns
+    colnames(subset_data) <- c("Y1", "Yj")  # renomear variaveis
+    }
     
+    subset_data # tabela final a ser mostrada. 
+    # Se o botao input$columns nao for pressionado, mostra os arquivos inalterados
+    # caso contrario, este se torna filtrado, e o arquivo se altera
     
-    # 2) Calculo do FH0, F Critico e p-valor ####
+  })
+ 
+  output$data <- renderDataTable({ # renderizamos uma DT::DataTable
+    
+   # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
+  data <- newData() 
+    
+  datatable(data) # Criamos uma DT::datatable com base no objeto
+  
+  # Este arquivo e reativo, e ira se alterar caso o usuario
+  # aperte o botao input$columns
+  
+  })
+  
+  output$tabgraybill <- renderTable({ # rendereizamos uma tabela normal
+    
+    # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
+    
+    dados <- newData() 
+    
+    # Este arquivo e reativo, e ira se alterar caso o usuario
+    # aperte o botao input$columns
+    
+    # O resto deste script se baseia no nome das colunas, Yj e Y1
+    # ou seja, equanto o usuario nao apertar input$columns,
+    # este codigo nao ira funcionar
+    
+    # Calculo do FH0, F Critico e p-valor ####
     
     # Ajusta-se um modelo Linear Simples composto do valor proposto como y,
     # e do valor padrao como x
@@ -105,7 +126,7 @@ shinyServer( function(input, output,session) {
       pf(FH0,1,fit$df.residual,lower=F),
       4)
     
-    # 3) Teste de Hipotese ####
+    # Teste de Hipotese ####
     
     # Logica condicional que cria um objeto denominado resultado
     # com fator "*" caso FH0 > 0, e caso contrario, "ns"
@@ -127,34 +148,39 @@ shinyServer( function(input, output,session) {
     
   })
   
-  output$plot <- renderPlot({
+  output$plot <- renderPlot({ # Renderizamos um grafico
     
-   # inFile <- input$file1
-    
-   # if (is.null(inFile))
-     # return(NULL)
-    
-   # dados <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec, quote=input$quote)
+  
+    # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
     
     dados <- newData()
     
-
+    # Este arquivo e reativo, e ira se alterar caso o usuario
+    # aperte o botao input$columns
     
-    ggplot(data = dados, aes(x = Y1, y = Yj)) +
-      geom_point(aes(), size = 3) +
-      labs(x="Valor Padrao", 
-           y="Valor Proposto", 
-           title = "Comparacao \n (Metodo proposto e alternativo)") +
-      geom_smooth(method="lm", colour="red") +
-      theme(axis.title=element_text(size=12, face= "bold" ), 
-            plot.title=element_text(size=16,face="bold") ) +
-      coord_cartesian(xlim = c(0, max(dados$Y1 + 0.3)),
+    # O resto deste script se baseia no nome das colunas, Yj e Y1
+    # ou seja, equanto o usuario nao apertar input$columns,
+    # este codigo nao ira funcionar
+    
+    # utilizando o pacote ggplot2, renderizamos um grafico de dispersao simples
+    
+    ggplot(data = dados, aes(x = Y1, y = Yj)) + # dados e variaveis utilizadas
+      geom_point(aes(), size = 3) + # grafico de dispersao
+      labs(x="Valor Padrao", # titulo eixo x
+           y="Valor Proposto", # titulo eixo y
+           title = "Comparacao \n (Metodo proposto e alternativo)") + # titulo do grafico
+      geom_smooth(method="lm", colour="red") + # linha do ajuste
+      theme(axis.title=element_text(size=12, face= "bold" ),  # tamanho da letra e tipo da letra dos eixos
+            plot.title=element_text(size=16,face="bold") ) + # tamanho da letra e tipo da letra do titulo
+      coord_cartesian(xlim = c(0, max(dados$Y1 + 0.3)), # alteracao da escala
                       ylim = c(0, max(dados$Yj + 0.3)))
     
   })
   
-  output$formula <- renderUI({
+  output$formula <- renderUI({ 
     
+    # renderizamos a formula do teste, apenas para efeito visual
+    # utilizamos a funcao withMathJax, e a liguagem LaTeX.
     withMathJax(
       h3("$$ F(H_{0})=\\frac{(\\hat{\\beta}-\\theta)'(Y'_{1} Y_{1})(\\hat{\\beta}-\\theta)}{2QMRes}  \\sim F_\\alpha (2,n-2 \\phantom{1}g.l.) $$")
     )

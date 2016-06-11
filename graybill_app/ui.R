@@ -3,72 +3,75 @@ library(DT)
 library(markdown)
 #library(shinythemes)
 
-shinyUI(
+shinyUI( # cria a interface de usuario
   
-  fluidPage(
+  fluidPage(  # layout utilizado
   
-  #theme = shinytheme("flatly"),
-  theme = "bootstrap.css",
+  #theme = shinytheme("flatly"), # seleciona um tema utilizando pacote
+  theme = "bootstrap.css", # seleciona um tema contido na pasta www
   
-  titlePanel("Teste F de Graybill"),
+  titlePanel("Teste F de Graybill"), # titulo do app
 
-  sidebarLayout(
+  sidebarLayout( # barra lateral
     
-    sidebarPanel(
+    sidebarPanel( # painel lateral
       
-      fileInput(
-        inputId = "file1",
+      fileInput( # input de arquivos
+        inputId = "file1", # Id
         
-        label = "Selecione o arquivo .csv ou .txt",
+        label = "Selecione o arquivo .csv ou .txt", # nome que sera mostrado na UI
         
-        accept=c('text/csv', 'text/comma-separated-values,text/plain', '.csv')),
+        accept=c('text/csv', 'text/comma-separated-values,text/plain', '.csv')), # tipos de arquivos aceitos
       
-      radioButtons(inputId='sep', 
-                   label='Separador',
-                   choices=c(Virgula=',', "Ponto e Virgula"=';', Tab='\t'),
-                   selected=';'),
+      radioButtons( # esta da ao usuario opcoes para clicar. Apenas uma e selecionada
+                   inputId='sep',  #Id
+                   label='Separador', # nome que sera mostrado na UI
+                   choices=c(Virgula=',', "Ponto e Virgula"=';', Tab='\t'), # opcoes e seus nomes
+                   selected=';'), # valor que sera selecionado inicialmente
       
-      radioButtons(inputId='dec', 
-                   label='Decimal',
-                   choices=c(Ponto=".", Virgula=","),
-                   selected=","),
+      radioButtons( # esta da ao usuario opcoes para clicar. Apenas uma e selecionada
+                   inputId='dec', # Id
+                   label='Decimal', # nome que sera mostrado na UI
+                   choices=c(Ponto=".", Virgula=","), # opcoes e seus nomes
+                   selected=","), # valor que sera selecionado inicialmente
       
-     actionButton("Load", "Carregue o arquivo"),
-      
+     actionButton( # botao que o usuario clica, e gera uma acao no server
+       "Load", # Id
+       "Carregue o arquivo"),  # nome que sera mostrado na UI
+     
+     # texto mostrado na UI
      helpText("As colunas devem ser obrigatoriamente nomeadas 'Y1' e 'Yj', para valores Padrao e Proposto, respectivamente."),
      
-     helpText("Para filtrar e renomear as colunas,  selecione as variaveis e clique no botao abaixo:"),
+     # texto mostrado na UI
+      helpText("Para filtrar e renomear as colunas,  selecione as variaveis e clique no botao abaixo:"),
      
-     selectizeInput(
-       'columns', "selecione as variaveis:", choices = "",
-       multiple = TRUE, options = list(maxItems = 2)  ),
+     selectizeInput( # cria uma lista de opcoes em que o usuario pode clicar
+                    'columns', # Id
+                    "selecione as variaveis:", # nome que sera mostrado na UI
+                     choices = "", # como as opcoes serao atualizadas de acordo com o arquivo que o usuario insere, deixamos este campo em branco
+                     multiple = TRUE,  # permite mais de uma opcao ser selecionada
+                     options = list(maxItems = 2)  ), # limita o numero de variaveis que o usuario pode selecionar
 
-     actionButton("subset", "Filtrar e renomear"),
+     actionButton(# botao que o usuario clica, e gera uma acao no server
+       "subset", # Id
+       "Filtrar e renomear"), # nome que sera mostrado na UI
 
-      width = 3 ), 
+      width = 3 ), # largura da barra lateral
     
-    mainPanel(
+    mainPanel( # painel principal
       
-      withMathJax(),
-      uiOutput("formula"),
+      withMathJax(), # utilizando a funcao MathJax
+      uiOutput("formula"), #renderizar output$formula
       
-      tabsetPanel(
-        id = "tabs",
-        tabPanel("Dados",     dataTableOutput("data"))        ,
-        tabPanel("Grafico",   plotOutput("plot"))             , 
-        tabPanel("Resultado", tableOutput("tabgraybill"))     ,
-        tabPanel("Creditos",  includeMarkdown("credit.md") )  ,
-        
-        selected = "Dados"
-                 
-               
-      )
-      
-    )
-  )
-  
-  
-  
-)
-
-)
+      tabsetPanel( # cria um painel com varias tabs, que o usuario seleciona qua deseja visualizar
+        id = "tabs", # id, caso ele seja referenciado em output
+        tabPanel("Dados",     dataTableOutput("data"))        , # painel para #output$data; mostra os dados inseridos pelo usuario
+        tabPanel("Grafico",   plotOutput("plot"))             , # painel para #output$plot; mostra o grafico gerado pelo ggplot
+        tabPanel("Resultado", tableOutput("tabgraybill"))     , # painel para #output$tabgraybill; mostra o resultado do teste F de Graybill
+        tabPanel("Creditos",  includeMarkdown("credit.md") )  , # painel para um arquivo markdown que foi criado separadamente, contendo texto.
+        selected = "Dados" # painel a ser mostrado inicialmente
+       ) # fecha tabsetPanel
+     ) # fecha mainPanel
+   ) # fecha sidebarLayout
+ ) #fecha fluidPage
+) # fecha shinyUI
