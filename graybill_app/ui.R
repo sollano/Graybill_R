@@ -43,18 +43,14 @@ shinyUI(
       
      helpText("As colunas devem ser obrigatoriamente nomeadas 'Y1' e 'Yj', para valores Padrao e Proposto, respectivamente."),
      
-     helpText("Para filtrar as colunas,  selecione as variaveis e clique no botao abaixo:"),
+     helpText("Para filtrar e renomear as colunas,  selecione as variaveis e clique no botao abaixo:"),
      
      selectizeInput(
        'columns', "selecione as variaveis:", choices = "",
        multiple = TRUE, options = list(maxItems = 2)  ),
 
-     actionButton("subset", "Filtrar"),
+     actionButton("subset", "Filtrar e renomear"),
 
-     helpText("Para renomear as colunas, clique no botao abaixo:"),
-
-     actionButton("rename", "Renomear"),
-      
       width = 3 ), 
     
     mainPanel(

@@ -32,10 +32,9 @@ shinyServer( function(input, output,session) {
     subset_data <- raw_data
 
     if(input$subset)
-    {subset_data <- raw_data[, input$columns] }
-    
-    if(input$rename)
-    {colnames(subset_data) <- c("Y1", "Yj") }
+    {
+    subset_data <- raw_data[, input$columns]
+    colnames(subset_data) <- c("Y1", "Yj")  }
     
     subset_data
     
