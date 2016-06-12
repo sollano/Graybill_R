@@ -72,7 +72,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     dados <- newData() 
     
     if(is.null(dados)){return(NULL)} # se o arquivo nao for carregado, retornar null
-    
+    # evita mensagens de erro caso o arquivo nao esteja carregado ainda
     
     # Este arquivo e reativo, e ira se alterar caso o usuario
     # aperte o botao input$columns
@@ -159,7 +159,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     dados <- newData()
     
     if(is.null(dados)){return(NULL)} # se o arquivo nao for carregado, retornar null
-    
+    # evita mensagens de erro cas o o arquivo nao esteja carregado ainda
     
     # Este arquivo e reativo, e ira se alterar caso o usuario
     # aperte o botao input$columns
