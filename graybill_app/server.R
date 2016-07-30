@@ -143,9 +143,10 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
     aux1 <- c(round(mean(dados$Y1),2), round(var(dados$Y1),2), round(sd(dados$Y1),2),  length(dados$Y1), 2, Ftab, FH0, alpha, pvalor, Resultado, Conclusao)
     aux2 <- c(round(mean(dados$Yj),2), round(var(dados$Yj),2), round(sd(dados$Yj),2), length(dados$Yj), fit$df.residual, " ", " ", " ", " ", " ", " ")
-    Tab_Res_Comp <- as.data.frame(cbind(aux1, aux2))
-    rownames(Tab_Res_Comp) <- c("Media", "Variancia", "Des. Padrao", "Observacoes", "g.l.", "F Critico", "F(H0)", "Alpha", "P-valor" ,"Teste", "Conclusao")
-    colnames(Tab_Res_Comp) <- c("Valor Padrao", "Valor Proposto")
+    
+    Tab_Res_Comp <- data.frame("Valor_Padrao" = aux1,"Valor_Proposto" = aux2)
+    rownames(Tab_Res_Comp) <- c("Media", "Variancia", "Desvio_Padrao", "Observacoes", "g.l.", "F_Critico", "F_H0", "Alpha", "P-valor" ,"Teste", "Conclusao")
+    
     
     Tab_Res_Comp
     
