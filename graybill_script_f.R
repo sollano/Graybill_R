@@ -119,22 +119,9 @@ Tab_Res_Simp <- data.frame("F_H0"    = FH0,
 
 # Criacao de um dataframe composto pelas variaveis geradas
 # Esta tabela nao possui fatores, apenas dados numericos
-Tab_Res_Med <- data.frame(Resultado = rbind(
-  mean(dados$Y1), 
-  mean(dados$Yj), 
-  var(dados$Y1), 
-  var(dados$Yj), 
-  sd(dados$Y1), 
-  sd(dados$Yj), 
-  length(dados$Y1), 
-  2, 
-  fit$df.residual, 
-  Ftab, 
-  FH0, 
-  alpha, 
-  pvalor))
+Tab_Res_Med <- data.frame(Resultado = rbind( mean(dados$Y1), mean(dados$Yj), var(dados$Y1), var(dados$Yj), sd(dados$Y1), sd(dados$Yj), length(dados$Y1), 2, fit$df.residual, Ftab, FH0, alpha, pvalor), 
+  row.names = c("Media_Y1", "Media_Yj", "Variancia_Y1", "Variancia_Yj", "Desvio_Padrao_Y1", "Desvio_Padrao_Yj", "Observacoes", "g.l.1", "g.l.2", "F_crit", "F_H0", "alpha",  "p-valor") )
 
-rownames(Tab_Res_Med) <- c("Media_Y1", "Media_Yj", "Variancia_Y1", "Variancia_Yj", "Desvio_Padrao_Y1", "Desvio_Padrao_Yj", "Observacoes", "g.l.1", "g.l.2", "F_crit", "F_H0", "alpha",  "p-valor")
 
 # 6) Tabela de Resultados completa ####
 
@@ -142,8 +129,10 @@ rownames(Tab_Res_Med) <- c("Media_Y1", "Media_Yj", "Variancia_Y1", "Variancia_Yj
 # Este dataframe possui fatores que indicam o resultado do teste
 aux1 <- c(round(mean(dados$Y1),2), round(var(dados$Y1),2), round(sd(dados$Y1),2),  length(dados$Y1), 2, Ftab, FH0, alpha, pvalor, Resultado, Conclusao)
 aux2 <- c(round(mean(dados$Yj),2), round(var(dados$Yj),2), round(sd(dados$Yj),2), length(dados$Yj), fit$df.residual, " ", " ", " ", " ", " ", " ")
-Tab_Res_Comp <- data.frame("Valor_Padrao" = aux1,"Valor_Proposto" = aux2)
-rownames(Tab_Res_Comp) <- c("Media", "Variancia", "Desvio_Padrao", "Observacoes", "g.l.", "F_Critico", "F_H0", "Alpha", "P-valor" ,"Teste", "Conclusao")
+
+Tab_Res_Comp <- data.frame("Valor_Padrao" = aux1,
+                           "Valor_Proposto" = aux2, 
+                           row.names = c("Media", "Variancia", "Desvio_Padrao", "Observacoes", "g.l.", "F_Critico", "F_H0", "Alpha", "P-valor" ,"Teste", "Conclusao") )
 
 # 7) Grafico de dispersao ####
 

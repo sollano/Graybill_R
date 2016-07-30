@@ -22,16 +22,16 @@ FdeGraybill <- function(Y1, Yj, alpha = 0.05, Tab = 3) {
                                 "Alpha"   = alpha,
                                 "Teste"   = Resultado) 
     
-  Tab_Res_Med <- data.frame(Resultado = rbind(mean(Y1), mean(Yj), var(Y1), var(Yj), sd(Y1), sd(Yj), length(Y1), 2, fit$df.residual, Ftab, FH0, alpha, pvalor))
-  rownames(Tab_Res_Med) <- c("Media_Y1", "Media_Yj", "Variancia_Y1", "Variancia_Yj", "Desvio_Padrao_Y1", "Desvio_Padrao_Yj", "Observacoes", "g.l.1", "g.l.2", "F_crit", "F_H0", "alpha",  "p valor")
+  Tab_Res_Med <- data.frame(Resultado = rbind(mean(Y1), mean(Yj), var(Y1), var(Yj), sd(Y1), sd(Yj), length(Y1), 2, fit$df.residual, Ftab, FH0, alpha, pvalor),
+                            row.names = c("Media_Y1", "Media_Yj", "Variancia_Y1", "Variancia_Yj", "Desvio_Padrao_Y1", "Desvio_Padrao_Yj", "Observacoes", "g.l.1", "g.l.2", "F_crit", "F_H0", "alpha",  "p valor") )
 
   aux1 <- c(round(mean(Y1),2), round(var(Y1),2), round(sd(Y1),2),  length(Y1), 2, Ftab, FH0, alpha, pvalor, Resultado, Conclusao)
   aux2 <- c(round(mean(Yj),2), round(var(Yj),2), round(sd(Yj),2), length(Yj), fit$df.residual, " ", " ", " ", " ", " ", " ")
   
-  Tab_Res_Comp <- data.frame("Valor_Padrao" = aux1,"Valor_Proposto" = aux2)
-  rownames(Tab_Res_Comp) <- c("Media", "Variancia", "Desvio_Padrao", "Observacoes", "g.l.", "F_Critico", "F_H0", "Alpha", "P-valor" ,"Teste", "Conclusao")
-  
-  
+  Tab_Res_Comp <- data.frame("Valor_Padrao" = aux1,
+                             "Valor_Proposto" = aux2, 
+                             row.names = c("Media", "Variancia", "Desvio_Padrao", "Observacoes", "g.l.", "F_Critico", "F_H0", "Alpha", "P-valor" ,"Teste", "Conclusao") )
+
   if(Tab==1)
     {
     return(Tab_Res_Simp)
