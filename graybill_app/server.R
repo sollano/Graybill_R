@@ -77,7 +77,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
   
   })
   
-  output$tabgraybill <- renderTable({ # rendereizamos uma tabela normal
+  tabgraybill <- reactive({ # rendereizamos uma tabela normal
     
     # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
     
@@ -164,7 +164,10 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
   })
   
-  output$plot <- renderPlot({ # Renderizamos um grafico
+  output$tablegraybill <-   renderTable({ tabgraybill() })
+
+    
+  graph <- reactive({ # Renderizamos um grafico
     
   
     # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
@@ -183,7 +186,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
     # utilizando o pacote ggplot2, renderizamos um grafico de dispersao simples
     
-    ggplot(data = dados, aes(x = Y1, y = Yj)) + # dados e variaveis utilizadas
+   graph <- ggplot(data = dados, aes(x = Y1, y = Yj)) + # dados e variaveis utilizadas
       geom_point(aes(), size = 3) + # grafico de dispersao
       labs(x="Valor Padrao", # titulo eixo x
            y="Valor Proposto", # titulo eixo y
@@ -193,6 +196,13 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
             plot.title=element_text(size=16,face="bold") ) + # tamanho da letra e tipo da letra do titulo
       coord_cartesian(xlim = c(0, max(dados$Y1 + 0.3)), # alteracao da escala
                       ylim = c(0, max(dados$Yj + 0.3)))
+    
+   graph
+   
+  })
+  
+  output$plot <- renderPlot({ 
+    graph()
     
   })
   
@@ -205,6 +215,46 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     )
     
   })
+  
+  output$downloadData <- downloadHandler(
+    filename = function() { 
+      
+      
+        "f_graybill_teste.xlsx"
+      
+    },
+    
+    content = function(file) {
+
+      
+        xlsx::write.xlsx2(as.data.frame( tabgraybill() ), file, row.names = F)
+      
+      
+      
+      
+    }
+  )
+  
+  output$downloadPlot <- downloadHandler(
+    filename = function() { 
+      
+      
+      "grafico_teste_f_graybill.png"
+      
+    },
+    
+    content = function(file) {
+      
+      
+      ggsave(file, graph(), width = 12, height = 6)
+      
+      
+      
+      
+    }
+  )
+  
+  
   
   
   })

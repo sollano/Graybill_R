@@ -71,8 +71,8 @@ shinyUI( # cria a interface de usuario
       tabsetPanel( # cria um painel com varias tabs, que o usuario seleciona qua deseja visualizar
         id = "tabs", # id, caso ele seja referenciado em output
         tabPanel("Dados",     dataTableOutput("data"))        , # painel para #output$data; mostra os dados inseridos pelo usuario
-        tabPanel("Grafico",   plotOutput("plot"))             , # painel para #output$plot; mostra o grafico gerado pelo ggplot
-        tabPanel("Resultado", tableOutput("tabgraybill"))     , # painel para #output$tabgraybill; mostra o resultado do teste F de Graybill
+        tabPanel("Grafico",   plotOutput("plot") , downloadButton('downloadPlot', 'Download') )             , # painel para #output$plot; mostra o grafico gerado pelo ggplot
+        tabPanel("Resultado", tableOutput("tablegraybill") , downloadButton('downloadData', 'Download') )     , # painel para #output$tabgraybill; mostra o resultado do teste F de Graybill
         tabPanel("Creditos",  includeMarkdown("credit.md") )  , # painel para um arquivo markdown que foi criado separadamente, contendo texto.
         selected = "Dados" # painel a ser mostrado inicialmente
        ) # fecha tabsetPanel
