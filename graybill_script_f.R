@@ -92,7 +92,7 @@ Ftab <- round(
 
 # Calculo do p-valor arredondado para 6 casas decimais
 pvalor <- signif(
-  pf(FH0,1,fit$df.residual,lower=F),
+  pf(FH0,2,fit$df.residual,lower=F),
   4)
 
 # 3) Teste de Hipotese ####

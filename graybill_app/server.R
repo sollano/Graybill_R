@@ -121,12 +121,12 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     # Calculo do F Critico utilizando os graus de liberdade do residuo,
     # e arredondado para 4 casas decimais
     Ftab <- round(
-      qf(p=alpha, df1=2, df2=fit$df.residual, lower.tail = FALSE),
+      qf(p=alpha, df1=2, df2=fit$df.residual, lower.tail = F),
       4)
     
     # Calculo do p-valor arredondado para 6 casas decimais
     pvalor <- signif(
-      pf(FH0,1,fit$df.residual,lower=F),
+      pf(FH0,df1=2,df2=fit$df.residual, lower.tail = F),
       4)
     
     # Teste de Hipotese ####
@@ -148,7 +148,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     rownames(Tab_Res_Comp) <- c("Media", "Variancia", "Desvio Padrao", "Observacoes", "g.l.", "F Critico", "F(H0)", "Alpha", "P-valor" ,"Teste", "Conclusao")
     
     
-    Tab_Res_Comp
+/    Tab_Res_Comp
     
   })
   

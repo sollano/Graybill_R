@@ -11,7 +11,7 @@ FdeGraybill <- function(Y1, Yj, alpha = 0.05, Tab = 3) {
     FH0 <- round((t(beta_theta)%*%Y1linha_Y1%*%beta_theta)/(2*QMRes),4)
    
      Ftab <- round(qf(p=alpha, df1=2, df2=fit$df.residual, lower.tail = FALSE),4)
-    pvalor <- round(pf(FH0,1,fit$df.residual,lower=F),6)
+    pvalor <- signif(pf(FH0,2,fit$df.residual,lower=F),4)
    
     if(FH0 > Ftab){Resultado <- "*"}else(Resultado <- "ns")  
     if(FH0 > Ftab){Conclusao <- "Yj e estatisticamente diferente de Y1, para o alpha estabelecido"}else{Conclusao <- "Yj e estatisticamente igual a Y1, para o alpha estabelecido"}
