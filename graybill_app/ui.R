@@ -1,6 +1,7 @@
 library(shiny)
 library(DT)
 library(markdown)
+library(readxl)
 #library(shinythemes)
 
 shinyUI( # cria a interface de usuario
@@ -19,13 +20,17 @@ shinyUI( # cria a interface de usuario
       fileInput( # input de arquivos
         inputId = "file1", # Id
         
-        label = "Selecione o arquivo .csv ou .txt", # nome que sera mostrado na UI
+        label = "Selecione o arquivo .csv, .txt ou .xlsx", # nome que sera mostrado na UI
         
-        accept=c('text/csv', 'text/comma-separated-values,text/plain', '.csv')), # tipos de arquivos aceitos
+        accept=c('text/csv/xlsx','.csv', ".xlsx")), # tipos de arquivos aceitos
+      
+      checkboxInput(inputId = "excel",
+                    label = "Excel (.xls ou .xslx) ?",
+                    value = F),
       
       radioButtons( # esta da ao usuario opcoes para clicar. Apenas uma e selecionada
                    inputId='sep',  #Id
-                   label='Separador', # nome que sera mostrado na UI
+                   label='Separador (para .csv ou .txt)', # nome que sera mostrado na UI
                    choices=c(Virgula=',', "Ponto e Virgula"=';', Tab='\t'), # opcoes e seus nomes
                    selected=';'), # valor que sera selecionado inicialmente
       

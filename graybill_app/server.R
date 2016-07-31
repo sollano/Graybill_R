@@ -1,6 +1,8 @@
 library(shiny)
 library(ggplot2)
 library(DT)
+library(xlsx)
+library(xlsxjars)
 
 shinyServer( function(input, output,session) { # como estamos usando reactive, cria-se session
   
@@ -11,8 +13,15 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     if(is.null(inFile)){return(NULL)} # se o arquivo nao for carregado, retornar null
     
     # Carregar o arquivo com base em input
-    mydata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
-    
+    if(input$excel==F)
+    {
+      mydata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
+      
+    }else {
+      mydata <- read.xlsx(inFile$datapath, 1)
+      
+    }
+
     names(mydata) # nomes das variaveis do arquivo carregado
   })  
   
@@ -35,7 +44,10 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     # ira conter os nomes dos arquivos locais onde o dado pode ser encontrado
     
     if (is.null(inFile)){return(NULL)} # se o arquivo nao for carregado, retornar null
-    else(raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote='"') )
+    else if(input$excel == F)
+      {
+      raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote='"')
+    } else {raw_data <- read.xlsx(inFile$datapath, 1)  }
     # Carregamos o arquivo em um objeto
 
     subset_data <- raw_data # Criamos uma copia do arquivo
@@ -148,7 +160,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     rownames(Tab_Res_Comp) <- c("Media", "Variancia", "Desvio Padrao", "Observacoes", "g.l.", "F Critico", "F(H0)", "Alpha", "P-valor" ,"Teste", "Conclusao")
     
     
-/    Tab_Res_Comp
+   Tab_Res_Comp
     
   })
   
