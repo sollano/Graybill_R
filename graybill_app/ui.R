@@ -22,7 +22,7 @@ shinyUI( # cria a interface de usuario
         
         label = "Selecione o arquivo .csv, .txt ou .xlsx", # nome que sera mostrado na UI
         
-        accept=c('text/csv/xlsx','.csv', ".xlsx")), # tipos de arquivos aceitos
+        accept=c('text/csv/xlsx','.csv', ".txt", ".xlsx")), # tipos de arquivos aceitos
       
       checkboxInput(inputId = "excel",
                     label = "Excel (.xls ou .xslx) ?",
