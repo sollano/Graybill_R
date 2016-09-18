@@ -9,7 +9,7 @@ shinyUI( # cria a interface de usuario
   fluidPage(  # layout utilizado
   
   #theme = shinytheme("flatly"), # seleciona um tema utilizando pacote
-  theme = "bootstrap.css", # seleciona um tema contido na pasta www
+  theme = "bootstrap8.css", # seleciona um tema contido na pasta www
   
   titlePanel("Teste F de Graybill"), # titulo do app
 
@@ -20,7 +20,7 @@ shinyUI( # cria a interface de usuario
       fileInput( # input de arquivos
         inputId = "file1", # Id
         
-        label = "Selecione o arquivo .csv, .txt ou .xlsx", # nome que sera mostrado na UI
+        label = "Selecione o arquivo: (.csv, .txt ou .xlsx)", # nome que sera mostrado na UI
         
         accept=c('text/csv/xlsx','.csv', ".txt", ".xlsx")), # tipos de arquivos aceitos
       
@@ -30,8 +30,8 @@ shinyUI( # cria a interface de usuario
       
       radioButtons( # esta da ao usuario opcoes para clicar. Apenas uma e selecionada
                    inputId='sep',  #Id
-                   label='Separador (para .csv ou .txt)', # nome que sera mostrado na UI
-                   choices=c(Virgula=',', "Ponto e Virgula"=';', Tab='\t'), # opcoes e seus nomes
+                   label='Selecione o separador:', # nome que sera mostrado na UI
+                   choices=c(Virgula=',', "Ponto e virgula"=';', Tab='\t'), # opcoes e seus nomes
                    selected=';'), # valor que sera selecionado inicialmente
       
       radioButtons( # esta da ao usuario opcoes para clicar. Apenas uma e selecionada
@@ -45,21 +45,21 @@ shinyUI( # cria a interface de usuario
        "Carregue o arquivo"),  # nome que sera mostrado na UI
      
      # texto mostrado na UI
-     helpText("As colunas devem ser obrigatoriamente nomeadas 'Y1' e 'Yj', para valores Padrao e Proposto, respectivamente."),
-     
-     # texto mostrado na UI
-      helpText("Para filtrar e renomear as colunas,  selecione as variaveis e clique no botao abaixo:"),
+     helpText("Selecione as colunas que seram utilizadas no teste, sendo primeiro o Valor Padrão, e segundo o Valor Proposto:"),
      
      selectizeInput( # cria uma lista de opcoes em que o usuario pode clicar
                     'columns', # Id
-                    "selecione as variaveis:", # nome que sera mostrado na UI
+                    "selecione as colunas:", # nome que sera mostrado na UI
                      choices = "", # como as opcoes serao atualizadas de acordo com o arquivo que o usuario insere, deixamos este campo em branco
                      multiple = TRUE,  # permite mais de uma opcao ser selecionada
                      options = list(maxItems = 2)  ), # limita o numero de variaveis que o usuario pode selecionar
 
+     sliderInput("alpha","Selecione o nivel de significância", 0.01, 0.1, 0.05, 0.01),
+     
+     
      actionButton(# botao que o usuario clica, e gera uma acao no server
-       "subset", # Id
-       "Filtrar e renomear"), # nome que sera mostrado na UI
+       "run", # Id
+       "Selecionar e realizar o teste"), # nome que sera mostrado na UI
 
       width = 3 ), # largura da barra lateral
     
@@ -70,11 +70,10 @@ shinyUI( # cria a interface de usuario
       
       tabsetPanel( # cria um painel com varias tabs, que o usuario seleciona qua deseja visualizar
         id = "tabs", # id, caso ele seja referenciado em output
-        tabPanel("Dados",     dataTableOutput("data"))        , # painel para #output$data; mostra os dados inseridos pelo usuario
+        tabPanel("Intro",  includeMarkdown("about.md") )  , # painel para um arquivo markdown que foi criado separadamente, contendo texto.
+        tabPanel("Dados",     DT::dataTableOutput("data"))        , # painel para #output$data; mostra os dados inseridos pelo usuario
         tabPanel("Grafico",   plotOutput("plot") , downloadButton('downloadPlot', 'Download') )             , # painel para #output$plot; mostra o grafico gerado pelo ggplot
-        tabPanel("Resultado", tableOutput("tablegraybill") , downloadButton('downloadData', 'Download') )     , # painel para #output$tabgraybill; mostra o resultado do teste F de Graybill
-        tabPanel("Creditos",  includeMarkdown("credit.md") )  , # painel para um arquivo markdown que foi criado separadamente, contendo texto.
-        selected = "Dados" # painel a ser mostrado inicialmente
+        tabPanel("Resultado", DT::dataTableOutput("tablegraybill", "70%"),  downloadButton('downloadData', 'Download') )      # painel para #output$tabgraybill; mostra o resultado do teste F de Graybill
        ) # fecha tabsetPanel
      ) # fecha mainPanel
    ) # fecha sidebarLayout

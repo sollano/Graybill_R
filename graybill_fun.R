@@ -2,8 +2,11 @@
 
 # Criar a funcao
 
-FdeGraybill <- function(Y1, Yj, alpha = 0.05, Tab = 3) {
+FdeGraybill <- function(df, Y1, Yj, alpha = 0.05, Tab = 3) {
   
+   Y1 <- df[[Y1]]
+   Yj <- df[[Yj]]
+   
     fit <- lm(Yj ~ Y1)
     QMRes <- sum(residuals(fit)^2)/fit$df.residual
     beta_theta <- coef(fit) - c(0,1)
@@ -63,13 +66,13 @@ library(readxl)
 dados <- read_excel("graybill_dados.xlsx", sheet = "graybill")
 
 #Teste padrão (tabela com resultados, e alpha = 0.05)
-FdeGraybill(Y1 = dados$Y1, Yj = dados$Yj)
+FdeGraybill(dados, Y1 = "Y1", Yj = "Yj")
 
 #Teste com Tabela numerica
-FdeGraybill(Y1 = dados$Y1, Yj = dados$Yj, Tab = 1)
+FdeGraybill(dados, Y1 = "Y1", Yj = "Yj", Tab = 1)
 
 #Teste com alpha 0.1
-FdeGraybill(Y1 = dados$Y1, Yj = dados$Yj, alpha = 0.1)
+FdeGraybill(dados, Y1 = "Y1", Yj = "Yj", alpha = 0.1)
 
 # teste por grupo
 
@@ -77,5 +80,5 @@ library(dplyr)
 
 dados %>%
   group_by(TALHAO) %>%
-  do(FdeGraybill(.$Y1, .$Yj, Tab = 1))
+  do(FdeGraybill(., "Y1", "Yj", Tab = 1))
 

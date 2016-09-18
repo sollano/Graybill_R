@@ -4,6 +4,50 @@ library(DT)
 library(xlsx)
 library(xlsxjars)
 
+FdeGraybill <- function(df, Y1, Yj, alpha = 0.05, Tab = 3) {
+  
+  Y1 <- df[[Y1]]
+  Yj <- df[[Yj]]
+  
+  fit <- lm(Yj ~ Y1)
+  QMRes <- sum(residuals(fit)^2)/fit$df.residual
+  beta_theta <- coef(fit) - c(0,1)
+  Y1linha_Y1 <- cbind(c(length(Y1), sum(Y1)), c(sum(Y1), sum(Y1^2)))
+  FH0 <- round((t(beta_theta)%*%Y1linha_Y1%*%beta_theta)/(2*QMRes),4)
+  
+  Ftab <- round(qf(p=alpha, df1=2, df2=fit$df.residual, lower.tail = FALSE),4)
+  pvalor <- signif(pf(FH0,2,fit$df.residual,lower=F),4)
+  
+  if(FH0 > Ftab){Resultado <- "*"}else(Resultado <- "ns")  
+  if(FH0 > Ftab){Conclusao <- "V. Proposto é estatisticamente diferente de V.Padrão, para o n. de significância estabelecido"}else{Conclusao <- "V. Proposto é estatisticamente igual a V. Padrão, para o n. de significância estabelecido"}
+  
+  Tab_Res_Simp <-  data.frame("F_H0"    = FH0, 
+                              "F_crit"  = Ftab, 
+                              "P_valor" = pvalor, 
+                              "Alpha"   = alpha,
+                              "Teste"   = Resultado) 
+  
+  Tab_Res_Med <- data.frame(Resultado = rbind(mean(Y1), mean(Yj), var(Y1), var(Yj), sd(Y1), sd(Yj), length(Y1), 2, fit$df.residual, Ftab, FH0, alpha, pvalor),
+                            row.names = c("Media_Y1", "Media_Yj", "Variancia_Y1", "Variancia_Yj", "Desvio_Padrao_Y1", "Desvio_Padrao_Yj", "Observacoes", "g.l.1", "g.l.2", "F_crit", "F_H0", "alpha",  "p valor") )
+  
+  aux1 <- c(round(mean(Y1),2), round(var(Y1),2), round(sd(Y1),2),  length(Y1), 2, Ftab, FH0, alpha, pvalor, Resultado, Conclusao)
+  aux2 <- c(round(mean(Yj),2), round(var(Yj),2), round(sd(Yj),2), length(Yj), fit$df.residual, " ", " ", " ", " ", " ", " ")
+  
+  Tab_Res_Comp <- data.frame("Valor Padrão" = aux1,
+                             "Valor Proposto" = aux2, 
+                             row.names = c("Média", "Variância", "Desvio Padrão", "Observações", "grau de liberdade", "F-Crítico", "F(H0)", "Nível de significância", "P-valor" ,"Teste", "Conclusão") )
+  
+  if(Tab==1)
+  {
+    return(Tab_Res_Simp)
+  } 
+  else if(Tab==2)
+  {
+    return(Tab_Res_Med)
+  }
+  else(return(Tab_Res_Comp))
+}
+
 shinyServer( function(input, output,session) { # como estamos usando reactive, cria-se session
   
   outVar <- reactive({ # iremos salvar os nomes das variaveis do objeto carregado em uma funcao reativa
@@ -15,7 +59,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     # Carregar o arquivo com base em input
     if(input$excel==F)
     {
-      mydata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote=input$quote)
+      mydata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec)
       
     }else {
       mydata <- read.xlsx(inFile$datapath, 1)
@@ -53,10 +97,9 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     subset_data <- raw_data # Criamos uma copia do arquivo
     # este sera mostrado enquanto o usuario nao seleciona colunas com input$columns
 
-    if(input$subset) # se o botao input#subset for apertado
+    if(input$run) # se o botao input#subset for apertado
     {
     subset_data <- raw_data[, input$columns] # filtar colunas com base em input$columns
-    colnames(subset_data) <- c("Y1", "Yj")  # renomear variaveis
     }
     
     subset_data # tabela final a ser mostrada. 
@@ -66,7 +109,8 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
   })
  
   output$data <- renderDataTable({ # renderizamos uma DT::DataTable
-    
+  
+      
    # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
   data <- newData() 
     
@@ -80,93 +124,24 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
   tabgraybill <- reactive({ # rendereizamos uma tabela normal
     
     # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
-    
+    if(is.null(newData() ) ){return()}
     dados <- newData() 
     
-    if(is.null(dados)){return(NULL)} # se o arquivo nao for carregado, retornar null
-    # evita mensagens de erro caso o arquivo nao esteja carregado ainda
+    x <- FdeGraybill(dados, input$columns[1], input$columns[2], alpha = input$alpha)
     
-    # Este arquivo e reativo, e ira se alterar caso o usuario
-    # aperte o botao input$columns
-    
-    # O resto deste script se baseia no nome das colunas, Yj e Y1
-    # ou seja, equanto o usuario nao apertar input$columns,
-    # este codigo nao ira funcionar
-    
-    # Calculo do FH0, F Critico e p-valor ####
-    
-    # Ajusta-se um modelo Linear Simples composto do valor proposto como y,
-    # e do valor padrao como x
-    fit <- lm(Yj ~ Y1, dados)
-    
-    # Calcula-se o Quadrado medio do residuo,  obtido pela razao entre 
-    # a soma de quadrados de residuos e os graus de liberdade do resíduo da regressao
-    QMRes <- sum(residuals(fit)^2)/fit$df.residual
-    
-    # Criacao da matrix 2x1 beta - theta, subtraindo os coeficientes da regressao
-    # pela matriz theta [0 1]
-    beta_theta <- coef(fit) - c(0,1)
-    
-    # Calculo da Matriz Y1'Y1
-    # esta matriz e composta por n, Somatorio de Y1, 
-    # Somatorio de Y1, e o somatorio quadratico de Y1
-    # Utilizamos a funcao length para calcular n, e a funcao sum para calcular os somatorios
-    # concatena-se n e Somatorio de Y1 em um vetor, e
-    # Somatorio de Y1 e somatorio quadratico de Y1 em outro
-    # e uni-se os dois com a funcao cbind
-    Y1linha_Y1 <- cbind(c(length(dados$Y1), sum(dados$Y1)), 
-                        c(sum(dados$Y1), sum(dados$Y1^2)))
-    
-    # Calculo de FH0
-    # Fazemos a multiplicacao da matriz beta_theta transposta,
-    # pela matriz Y1'Y1, e multiplicamos isto pela matriz beta_theta;
-    # entao dividimos tudo isto por 2*Quadrado medio do residuo
-    # Arredondamos este calculo para 4 casas decimais com a funcao round()
-    FH0 <- round(
-      (t(beta_theta)%*%Y1linha_Y1%*%beta_theta)
-      /(2*QMRes),
-      4)
-    
-    # Definicao do alpha
-    alpha <- 0.05
-    
-    # Calculo do F Critico utilizando os graus de liberdade do residuo,
-    # e arredondado para 4 casas decimais
-    Ftab <- round(
-      qf(p=alpha, df1=2, df2=fit$df.residual, lower.tail = F),
-      4)
-    
-    # Calculo do p-valor arredondado para 6 casas decimais
-    pvalor <- signif(
-      pf(FH0,df1=2,df2=fit$df.residual, lower.tail = F),
-      4)
-    
-    # Teste de Hipotese ####
-    
-    # Logica condicional que cria um objeto denominado resultado
-    # com fator "*" caso FH0 > 0, e caso contrario, "ns"
-    if(FH0 > Ftab)
-    {Resultado <- "*"}else
-      (Resultado <- "ns")
-    # Logica condicional semelhante a anterior
-    if(FH0 > Ftab)
-    {Conclusao <- "Yj e estatisticamente diferente de Y1, para o alpha estabelecido"}else
-    {Conclusao <- "Yj e estatisticamente igual a Y1, para o alpha estabelecido"}
-    
-    aux1 <- c(round(mean(dados$Y1),2), round(var(dados$Y1),2), round(sd(dados$Y1),2),  length(dados$Y1), 2, Ftab, FH0, alpha, pvalor, Resultado, Conclusao)
-    aux2 <- c(round(mean(dados$Yj),2), round(var(dados$Yj),2), round(sd(dados$Yj),2), length(dados$Yj), fit$df.residual, " ", " ", " ", " ", " ", " ")
-    
-    Tab_Res_Comp <- data.frame("Valor Padrao" = aux1,"Valor Proposto" = aux2)
-    rownames(Tab_Res_Comp) <- c("Media", "Variancia", "Desvio Padrao", "Observacoes", "g.l.", "F Critico", "F(H0)", "Alpha", "P-valor" ,"Teste", "Conclusao")
-    
-    
-   Tab_Res_Comp
+    x
     
   })
   
-  output$tablegraybill <-   renderTable({ tabgraybill() })
-
+  output$tablegraybill <-renderDataTable({ 
     
+    x <- tabgraybill() 
+    
+    datatable(x, options = list(searching = FALSE,
+                                          paging=FALSE ) )
+    
+    })
+
   graph <- reactive({ # Renderizamos um grafico
     
   
@@ -176,6 +151,9 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
     if(is.null(dados)){return(NULL)} # se o arquivo nao for carregado, retornar null
     # evita mensagens de erro cas o o arquivo nao esteja carregado ainda
+    
+    dados <- dados[,input$columns] # filtrar dataframe
+    names(dados) <- c("Y1", "Yj") # renomear dataframe
     
     # Este arquivo e reativo, e ira se alterar caso o usuario
     # aperte o botao input$columns
@@ -188,9 +166,9 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
    graph <- ggplot(data = dados, aes(x = Y1, y = Yj)) + # dados e variaveis utilizadas
       geom_point(aes(), size = 3) + # grafico de dispersao
-      labs(x="Valor Padrao", # titulo eixo x
+      labs(x="Valor Padrão", # titulo eixo x
            y="Valor Proposto", # titulo eixo y
-           title = "Comparacao \n (Metodo proposto e alternativo)") + # titulo do grafico
+           title = "Comparacao \n (Valor Proposto x Padrão)") + # titulo do grafico
       geom_smooth(method="lm", colour="red") + # linha do ajuste
       theme(axis.title=element_text(size=12, face= "bold" ),  # tamanho da letra e tipo da letra dos eixos
             plot.title=element_text(size=16,face="bold") ) + # tamanho da letra e tipo da letra do titulo
