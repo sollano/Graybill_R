@@ -65,8 +65,6 @@ shinyUI( # cria a interface de usuario
     
     mainPanel( # painel principal
       
-      withMathJax(), # utilizando a funcao MathJax
-      uiOutput("formula"), #renderizar output$formula
       
       tabsetPanel( # cria um painel com varias tabs, que o usuario seleciona qua deseja visualizar
         id = "tabs", # id, caso ele seja referenciado em output
@@ -74,7 +72,12 @@ shinyUI( # cria a interface de usuario
         tabPanel("Dados",     DT::dataTableOutput("data"))        , # painel para #output$data; mostra os dados inseridos pelo usuario
         tabPanel("Grafico",   plotOutput("plot") , downloadButton('downloadPlot', 'Download') )             , # painel para #output$plot; mostra o grafico gerado pelo ggplot
         tabPanel("Resultado", DT::dataTableOutput("tablegraybill", "70%"),  downloadButton('downloadData', 'Download') )      # painel para #output$tabgraybill; mostra o resultado do teste F de Graybill
-       ) # fecha tabsetPanel
+
+       )#, # fecha tabsetPanel
+      
+     # withMathJax(), # utilizando a funcao MathJax
+    #  uiOutput("formula") #renderizar output$formula
+      
      ) # fecha mainPanel
    ) # fecha sidebarLayout
  ) #fecha fluidPage

@@ -6,3 +6,6 @@ Para rodar o app, utilize:
 ````R
 shiny::runGitHub("Graybill_R", "sollano", subdir = "graybill_app")
 ````
+ou
+
+https://sollano.shinyapps.io/graybill_app/
