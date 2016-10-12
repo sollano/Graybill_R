@@ -4,7 +4,7 @@ library(DT)
 library(xlsx)
 library(xlsxjars)
 
-FdeGraybill <- function(df, Y1, Yj, alpha = 0.05, Tab = 3) {
+FdeGraybill_ <- function(df, Y1, Yj, alpha = 0.05, Tab = 3) {
   
   Y1 <- df[[Y1]]
   Yj <- df[[Yj]]
@@ -62,8 +62,9 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
       mydata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec)
       
     }else {
-      mydata <- read.xlsx(inFile$datapath, 1)
-      
+      file.copy(inFile$datapath,
+                paste(inFile$datapath, "xlsx", sep="."));
+      mydata <- readxl::read_excel(paste(inFile$datapath, "xlsx", sep="."), 1)       
     }
 
     names(mydata) # nomes das variaveis do arquivo carregado
@@ -91,7 +92,11 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     else if(input$excel == F)
       {
       raw_data <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, dec=input$dec,quote='"')
-    } else {raw_data <- read.xlsx(inFile$datapath, 1)  }
+    } else {
+      file.copy(inFile$datapath,
+                paste(inFile$datapath, "xlsx", sep="."));
+      raw_data <- readxl::read_excel(paste(inFile$datapath, "xlsx", sep="."), 1)       
+    }
     # Carregamos o arquivo em um objeto
 
     subset_data <- raw_data # Criamos uma copia do arquivo
@@ -127,7 +132,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     if(is.null(newData() ) ){return()}
     dados <- newData() 
     
-    x <- FdeGraybill(dados, input$columns[1], input$columns[2], alpha = input$alpha)
+    x <- FdeGraybill_(dados, input$columns[1], input$columns[2], alpha = input$alpha)
     
     x
     
@@ -165,15 +170,15 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     # utilizando o pacote ggplot2, renderizamos um grafico de dispersao simples
     
    graph <- ggplot(data = dados, aes(x = Y1, y = Yj)) + # dados e variaveis utilizadas
-      geom_point(aes(), size = 3) + # grafico de dispersao
+      geom_point(size = 3) + # grafico de dispersao
       labs(x="Valor Padrão", # titulo eixo x
            y="Valor Proposto", # titulo eixo y
            title = "Comparacao \n (Valor Proposto x Padrão)") + # titulo do grafico
       geom_smooth(method="lm", colour="red") + # linha do ajuste
       theme(axis.title=element_text(size=12, face= "bold" ),  # tamanho da letra e tipo da letra dos eixos
-            plot.title=element_text(size=16,face="bold") ) + # tamanho da letra e tipo da letra do titulo
-      coord_cartesian(xlim = c(0, max(dados$Y1 + 0.3)), # alteracao da escala
-                      ylim = c(0, max(dados$Yj + 0.3)))
+            plot.title=element_text(size=16,face="bold") ) #+ # tamanho da letra e tipo da letra do titulo
+    #  coord_cartesian(xlim = c(0, max(dados$Y1 + 0.3)), # alteracao da escala
+                     # ylim = c(0, max(dados$Yj + 0.3)))
     
    graph
    
