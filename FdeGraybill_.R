@@ -1,0 +1,43 @@
+FdeGraybill_ <- function(df, Y1, Yj, alpha = 0.05, Tab = 3) {
+  
+  Y1 <- df[[Y1]]
+  Yj <- df[[Yj]]
+  
+  fit <- lm(Yj ~ Y1)
+  QMRes <- sum(residuals(fit)^2)/fit$df.residual
+  beta_theta <- coef(fit) - c(0,1)
+  Y1linha_Y1 <- cbind(c(length(Y1), sum(Y1)), c(sum(Y1), sum(Y1^2)))
+  FH0 <- round((t(beta_theta)%*%Y1linha_Y1%*%beta_theta)/(2*QMRes),4)
+  
+  Ftab <- round(qf(p=alpha, df1=2, df2=fit$df.residual, lower.tail = FALSE),4)
+  pvalor <- signif(pf(FH0,2,fit$df.residual,lower=F),4)
+  
+  if(FH0 > Ftab){Resultado <- "*"}else(Resultado <- "ns")  
+  if(FH0 > Ftab){Conclusao <- "V. Proposto é estatisticamente diferente de V.Padrão, para o n. de significância estabelecido"}else{Conclusao <- "V. Proposto é estatisticamente igual a V. Padrão, para o n. de significância estabelecido"}
+  
+  Tab_Res_Simp <-  data.frame("F_H0"    = FH0, 
+                              "F_crit"  = Ftab, 
+                              "P_valor" = pvalor, 
+                              "Alpha"   = alpha,
+                              "Teste"   = Resultado) 
+  
+  Tab_Res_Med <- data.frame(Resultado = rbind(mean(Y1), mean(Yj), var(Y1), var(Yj), sd(Y1), sd(Yj), length(Y1), 2, fit$df.residual, Ftab, FH0, alpha, pvalor),
+                            row.names = c("Media_Y1", "Media_Yj", "Variancia_Y1", "Variancia_Yj", "Desvio_Padrao_Y1", "Desvio_Padrao_Yj", "Observacoes", "g.l.1", "g.l.2", "F_crit", "F_H0", "alpha",  "p valor") )
+  
+  aux1 <- c(round(mean(Y1),2), round(var(Y1),2), round(sd(Y1),2),  length(Y1), 2, Ftab, FH0, alpha, pvalor, Resultado, Conclusao)
+  aux2 <- c(round(mean(Yj),2), round(var(Yj),2), round(sd(Yj),2), length(Yj), fit$df.residual, " ", " ", " ", " ", " ", " ")
+  
+  Tab_Res_Comp <- data.frame("Valor Padrão" = aux1,
+                             "Valor Proposto" = aux2, 
+                             row.names = c("Média", "Variância", "Desvio Padrão", "Observações", "grau de liberdade", "F-Crítico", "F(H0)", "Nível de significância", "P-valor" ,"Teste", "Conclusão") )
+  
+  if(Tab==1)
+  {
+    return(Tab_Res_Simp)
+  } 
+  else if(Tab==2)
+  {
+    return(Tab_Res_Med)
+  }
+  else(return(Tab_Res_Comp))
+}
