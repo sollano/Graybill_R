@@ -37,21 +37,17 @@
 
 library(readxl)
 library(ggplot2)
-library(gridExtra)
-library(grid)
 
 # 1) Importar os dados ####
 
 # obs: colocar a planilha "dados_graybill.xlsx" na pasta do diretorio de trabalho
-dados <- read_excel("graybill_dados.xlsx", 1)
+dados <- read_excel("graybill_dados.xlsx")
 
 # 2) Calculo do FH0, F Critico e p-valor ####
 
 # Ajusta-se um modelo Linear Simples composto do valor proposto como y,
 # e do valor padrao como x
 fit <- lm(Yj ~ Y1, dados)
-
-
 
 # Calcula-se o Quadrado medio do residuo,  obtido pela razao entre 
 # a soma de quadrados de residuos e os graus de liberdade do resíduo da regressao
@@ -99,13 +95,17 @@ pvalor <- signif(
 
 # Logica condicional que cria um objeto denominado resultado
 # com fator "*" caso FH0 > 0, e caso contrario, "ns"
-if(FH0 > Ftab)
-  {Resultado <- "*"}else
-    (Resultado <- "ns")
+if(FH0 > Ftab){
+  Resultado <- "*"
+}else{
+    Resultado <- "ns"
+    }
 # Logica condicional semelhante a anterior
-if(FH0 > Ftab)
-{Conclusao <- "Yj e estatisticamente diferente de Y1, para o alpha estabelecido"}else
-    {Conclusao <- "Yj e estatisticamente igual a Y1, para o alpha estabelecido"}
+if(FH0 > Ftab){
+  Conclusao <- "Yj e estatisticamente diferente de Y1, para o alpha estabelecido"
+}else{
+    Conclusao <- "Yj e estatisticamente igual a Y1, para o alpha estabelecido"
+    }
 
 # 4) Tabela de Resultados Simples ####
 
@@ -166,8 +166,6 @@ graph2 <- ggplot(data = dados, aes(x = Y1, y = Yj)) +
   coord_cartesian(xlim = c(0, max(dados$Y1 + 0.3)), 
                   ylim = c(0, max(dados$Yj + 0.3)))
 
-
-
 # 8) Resultados ####
 
 graph
@@ -177,15 +175,12 @@ Tab_Res_Comp
 
 # 9) Exportar os resultados ####
 
-#Obs: a funcao "file.choose()" so funciona no S.O. Windows
-# caso necessario, pode-se especificar o caminho desejado na funcao
-
 # Grafico
-ggsave(filename = file.choose(), plot = graph)
+ggsave("graph.png", graph, width = 12, height = 6)
 
 # Tabela com resultados
-write.csv(Tab_Res_Comp, file.choose())
+write.csv2(Tab_Res_Comp, "Tab_Res_Comp.csv", row.names = F)
 
 #Tabela Numerica
-write.csv(Tab_Res_Med, file.choose())
+write.csv2(Tab_Res_Med, "Tab_Res_Med.csv", row.names = F)
 
