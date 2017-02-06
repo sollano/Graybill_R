@@ -3,6 +3,7 @@ library(ggplot2)
 library(DT)
 library(xlsx)
 library(xlsxjars)
+library(plotly)
 
 FdeGraybill_ <- function(df, Y1, Yj, alpha = 0.05, Tab = 3) {
   
@@ -78,6 +79,12 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
       choices = outVar()) # lista de opcoes. No caso, nomes das variaveis do arquivo carregado pelo usuario
     })
   
+  observe({ # este observe muda a tab selecionada para dados
+    # caso o usuário carregue os dados (clicando no action button Load)
+    if (input$Load) updateTabsetPanel(session, "tabs", selected = "Dados")
+     
+  })
+  
   newData <- reactive({ # Criamos uma nova funcao reactive. este sera o objeto filtrado, utilizado nos calculos
     
     if(input$Load==0){return()} # se o botao load nao for pressionado(==0), retornar nada
@@ -126,7 +133,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
   
   })
   
-  tabgraybill <- reactive({ # rendereizamos uma tabela normal
+  tabgraybill <- reactive({ # renderizamos uma tabela normal
     
     # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
     if(is.null(newData() ) ){return()}
@@ -154,7 +161,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
     dados <- newData()
     
-    if(is.null(dados)){return(NULL)} # se o arquivo nao for carregado, retornar null
+    if(is.null(dados)){return()} # se o arquivo nao for carregado, retornar null
     # evita mensagens de erro cas o o arquivo nao esteja carregado ainda
     
     dados <- dados[,input$columns] # filtrar dataframe
@@ -173,10 +180,10 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
       geom_point(size = 3) + # grafico de dispersao
       labs(x="Valor Padrão", # titulo eixo x
            y="Valor Proposto", # titulo eixo y
-           title = "Comparacao \n (Valor Proposto x Padrão)") + # titulo do grafico
-      geom_smooth(method="lm", colour="red") + # linha do ajuste
+           title = "Comparação \n (Valor Proposto x Padrão)") + # titulo do grafico
+      geom_smooth(method="lm", colour="red",se=F) + # linha do ajuste
       theme(axis.title=element_text(size=12, face= "bold" ),  # tamanho da letra e tipo da letra dos eixos
-            plot.title=element_text(size=16,face="bold") ) #+ # tamanho da letra e tipo da letra do titulo
+            plot.title=element_text(size=16,face="bold", hjust = 0.5) ) #+ # tamanho da letra e tipo da letra do titulo
     #  coord_cartesian(xlim = c(0, max(dados$Y1 + 0.3)), # alteracao da escala
                      # ylim = c(0, max(dados$Yj + 0.3)))
     
@@ -184,8 +191,15 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
    
   })
   
-  output$plot <- renderPlot({ 
-    graph()
+  output$plot <- plotly::renderPlotly({ 
+    
+   if(is.null(graph()) ) return(NULL)
+    
+     g <- graph()
+     
+     plotly::ggplotly(g)
+    
+   
     
   })
   

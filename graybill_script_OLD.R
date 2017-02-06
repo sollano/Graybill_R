@@ -1,8 +1,4 @@
-### Script criado por: Sollano Rabelo Braga e Marcio Leles R. de Oliveira
-
-### Aplicando o teste F(H0) de Graybill e graficos de analise 
-
-## F(H0) = ((beta - theta)'*(Y1'Y1)*(beta - theta))/(2*QMRes)
+# $$ F(H_{0})=\frac{(\hat{\beta}-\theta)'(y'_{1} y_{1})(\hat{\beta}-\theta)}{2QMRes}  \sim F_\alpha (2,n-2 \phantom{1}g.l.) $$
 
 # INSTRUCOES:
 
