@@ -84,3 +84,14 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 .Rproj.user
+
+# data
+
+graybill_script_OLD.R
+graph.png
+Tab_Res_Comp.csv
+Tab_Res_Med.csv
+Tab_Res_Simp.csv
+FdeGraybill_.R
+FdeGraybill.R
+graybill_fun.R
