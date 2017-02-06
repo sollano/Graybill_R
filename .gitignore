@@ -1,11 +1,16 @@
 
 # Custom
-graybill_dados.csv
-#ex.csv
-graybill_dados.xlsx
 documents
 Graybill_R.Rproj
 graybill_app/rsconnect
+graybill_script_OLD.R
+graph.png
+Tab_Res_Comp.csv
+Tab_Res_Med.csv
+Tab_Res_Simp.csv
+FdeGraybill_.R
+FdeGraybill.R
+graybill_fun.R
 
 # History files
 .Rhistory
@@ -85,13 +90,4 @@ $RECYCLE.BIN/
 *.lnk
 .Rproj.user
 
-# data
 
-graybill_script_OLD.R
-graph.png
-Tab_Res_Comp.csv
-Tab_Res_Med.csv
-Tab_Res_Simp.csv
-FdeGraybill_.R
-FdeGraybill.R
-graybill_fun.R
