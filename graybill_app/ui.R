@@ -69,7 +69,9 @@ shinyUI( # cria a interface de usuario
           id = "tabs", # id, caso ele seja referenciado em output
           tabPanel("Intro",  includeMarkdown("about.md") )  , # painel para um arquivo markdown que foi criado separadamente, contendo texto.
           tabPanel("Dados",    DT::dataTableOutput("data") )        , # painel para #output$data; mostra os dados inseridos pelo usuario
-          tabPanel("Grafico",   plotly::plotlyOutput("plot") , downloadButton('downloadPlot', 'Download') )             , # painel para #output$plot; mostra o grafico gerado pelo ggplot
+          tabPanel("Grafico",   plotOutput("plot1",click = "plot1_click") , 
+                   actionButton("exclude_reset", "Resetar pontos"),
+                   downloadButton('downloadPlot', 'Download') ) , # painel para #output$plot; mostra o grafico gerado pelo ggplot
           tabPanel("Resultado", DT::dataTableOutput("tablegraybill", "70%"),  downloadButton('downloadData', 'Download') )      # painel para #output$tabgraybill; mostra o resultado do teste F de Graybill
           
         )#, # fecha tabsetPanel

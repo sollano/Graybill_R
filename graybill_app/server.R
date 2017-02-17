@@ -3,7 +3,6 @@ library(ggplot2)
 library(DT)
 library(xlsx)
 library(xlsxjars)
-library(plotly)
 
 FdeGraybill_ <- function(df, Y1, Yj, alpha = 0.05, Tab = 3) {
   
@@ -85,6 +84,8 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
      
   })
   
+  vals <- reactiveValues()
+  
   newData <- reactive({ # Criamos uma nova funcao reactive. este sera o objeto filtrado, utilizado nos calculos
     
     if(input$Load==0){return()} # se o botao load nao for pressionado(==0), retornar nada
@@ -114,6 +115,9 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     subset_data <- raw_data[, input$columns] # filtar colunas com base em input$columns
     }
     
+    vals$keeprows = rep(TRUE, nrow(raw_data) )
+    
+    
     subset_data # tabela final a ser mostrada. 
     # Se o botao input$columns nao for pressionado, mostra os arquivos inalterados
     # caso contrario, este se torna filtrado, e o arquivo se altera
@@ -124,9 +128,12 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
   
       
    # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
-  data <- newData() 
-    
-  datatable(data) # Criamos uma DT::datatable com base no objeto
+  df <- newData() 
+  
+  df <- df[vals$keeprows, ]
+  
+  datatable(df, options = list(searching = FALSE,
+                                  paging=TRUE,pageLength = 30)) # Criamos uma DT::datatable com base no objeto
   
   # Este arquivo e reativo, e ira se alterar caso o usuario
   # aperte o botao input$columns
@@ -137,9 +144,11 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
     # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
     if(is.null(newData() ) ){return()}
-    dados <- newData() 
+    df <- newData() 
     
-    x <- FdeGraybill_(dados, input$columns[1], input$columns[2], alpha = input$alpha)
+    df <- df[vals$keeprows, ]
+    
+    x <- FdeGraybill_(df, input$columns[1], input$columns[2], alpha = input$alpha)
     
     x
     
@@ -154,63 +163,58 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
     })
 
-  graph <- reactive({ # Renderizamos um grafico
+  output$plot1 <- renderPlot({ 
     
-  
     # salvamos a funcao newData, que contem o arquivo carregado pelo usuario em um objeto
     
-    dados <- newData()
+    df <- newData()
     
-    if(is.null(dados)){return()} # se o arquivo nao for carregado, retornar null
+    if(is.null(df)){return()} # se o arquivo nao for carregado, retornar null
     # evita mensagens de erro cas o o arquivo nao esteja carregado ainda
-    
-    dados <- dados[,input$columns] # filtrar dataframe
-    names(dados) <- c("Y1", "Yj") # renomear dataframe
     
     # Este arquivo e reativo, e ira se alterar caso o usuario
     # aperte o botao input$columns
-    
+    # Plot the kept and excluded points as two separate data sets
+    keep    <- df[ vals$keeprows, , drop = FALSE]
+    exclude <- df[!vals$keeprows, , drop = FALSE]
+
     # O resto deste script se baseia no nome das colunas, Yj e Y1
     # ou seja, equanto o usuario nao apertar input$columns,
     # este codigo nao ira funcionar
     
     # utilizando o pacote ggplot2, renderizamos um grafico de dispersao simples
     
-   graph <- ggplot(data = dados, aes(x = Y1, y = Yj)) + # dados e variaveis utilizadas
-      geom_point(size = 3) + # grafico de dispersao
+    graph <- ggplot(data = keep, aes_string(input$columns[1], input$columns[2]) ) + # dados e variaveis utilizadas
+      geom_smooth(method="lm", colour="red",se=F) + # linha do ajuste
+      geom_point(size=5) +
+      geom_point(data=exclude, fill=NA,col="black",alpha=0.75,shape=21, size=5) + # grafico de dispersao
       labs(x="Valor Padrão", # titulo eixo x
            y="Valor Proposto", # titulo eixo y
            title = "Comparação \n (Valor Proposto x Padrão)") + # titulo do grafico
-      geom_smooth(method="lm", colour="red",se=F) + # linha do ajuste
       theme(axis.title=element_text(size=12, face= "bold" ),  # tamanho da letra e tipo da letra dos eixos
             plot.title=element_text(size=16,face="bold", hjust = 0.5) ) #+ # tamanho da letra e tipo da letra do titulo
     #  coord_cartesian(xlim = c(0, max(dados$Y1 + 0.3)), # alteracao da escala
-                     # ylim = c(0, max(dados$Yj + 0.3)))
+    # ylim = c(0, max(dados$Yj + 0.3)))
     
-   graph
-   
-  })
-  
-  output$plot <- plotly::renderPlotly({ 
+    graph     
     
-   if(is.null(graph()) ) return(NULL)
     
-     g <- graph()
-     
-     plotly::ggplotly(g)
     
-   
     
   })
   
-  output$formula <- renderUI({ 
+  # Toggle points that are clicked
+  observeEvent(input$plot1_click, {
+    df <- newData()
+    res <- nearPoints(df, input$plot1_click, allRows = TRUE)
     
-    # renderizamos a formula do teste, apenas para efeito visual
-    # utilizamos a funcao withMathJax, e a liguagem LaTeX.
-    withMathJax(
-      h3("$$ F(H_{0})=\\frac{(\\hat{\\beta}-\\theta)'(Y'_{1} Y_{1})(\\hat{\\beta}-\\theta)}{2QMRes}  \\sim F_\\alpha (2,n-2 \\phantom{1}g.l.) $$")
-    )
-    
+    vals$keeprows <- xor(vals$keeprows, res$selected_)
+  })
+
+  # Reset all points
+  observeEvent(input$exclude_reset, {
+    df <- newData()
+    vals$keeprows <- rep(TRUE, nrow(df) )
   })
   
   output$downloadData <- downloadHandler(
@@ -250,10 +254,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
       
     }
   )
-  
-  
-  
-  
+
   })
   
 
