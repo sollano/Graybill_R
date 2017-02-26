@@ -81,6 +81,8 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
   observe({ # este observe muda a tab selecionada para dados
     # caso o usuário carregue os dados (clicando no action button Load)
     if (input$Load) updateTabsetPanel(session, "tabs", selected = "Dados")
+    if (input$run) updateTabsetPanel(session, "tabs", selected = "Resultado")
+    
      
   })
   
@@ -158,6 +160,8 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
     x <- tabgraybill() 
     
+    if(is.null(x)){return()} # se o arquivo nao for carregado, retornar null
+    
     datatable(x, options = list(searching = FALSE,
                                           paging=FALSE ) )
     
@@ -216,7 +220,32 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     df <- newData()
     vals$keeprows <- rep(TRUE, nrow(df) )
   })
+
   
+  output$texto <- renderUI({
+    
+    paste("Clique nos pontos para removê-los do teste.")
+    
+  })
+  
+  output$exludeded_rows <- renderDataTable({
+    
+    df <- newData() 
+    
+    if(is.null(df)){return()} # se o arquivo nao for carregado, retornar null
+    
+    res <- nearPoints(df, input$plot1_click, allRows = TRUE)
+    
+    validate(need( !xor(vals$keeprows, res$selected_) , "" )  )
+    
+    
+    df <- df[!vals$keeprows, ]
+    
+    datatable(df, options = list(searching = FALSE,
+                                 paging = FALSE)) # Criamos uma DT::datatable com base no objeto
+
+  })
+    
   output$downloadData <- downloadHandler(
     filename = function() { 
       
