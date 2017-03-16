@@ -44,15 +44,21 @@ shinyUI( # cria a interface de usuario
           "Carregue o arquivo"),  # nome que sera mostrado na UI
         
         # texto mostrado na UI
-        helpText("Selecione as colunas que seram utilizadas no teste, sendo primeiro o Valor Padrão, e segundo o Valor Proposto:"),
+        h4("Selecione as colunas que serão utilizadas no teste:"),
         
         selectizeInput( # cria uma lista de opcoes em que o usuario pode clicar
-          'columns', # Id
-          "selecione as colunas:", # nome que sera mostrado na UI
-          choices = "", # como as opcoes serao atualizadas de acordo com o arquivo que o usuario insere, deixamos este campo em branco
-          multiple = TRUE,  # permite mais de uma opcao ser selecionada
-          options = list(maxItems = 2)  ), # limita o numero de variaveis que o usuario pode selecionar
+          'columnY1', # Id
+          "selecione a coluna do valor padrão:", # nome que sera mostrado na UI
+          choices = "" # como as opcoes serao atualizadas de acordo com o arquivo que o usuario insere, deixamos este campo em branco
+                       ), 
+
+        selectizeInput( # cria uma lista de opcoes em que o usuario pode clicar
+          'columnYj', # Id
+          "selecione a coluna do valor proposto:", # nome que sera mostrado na UI
+          choices = "" # como as opcoes serao atualizadas de acordo com o arquivo que o usuario insere, deixamos este campo em branco
+                      ), 
         
+                
         sliderInput("alpha","Selecione o nivel de significância", 0.01, 0.1, 0.05, 0.01),
         
         

@@ -74,9 +74,17 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
 
       updateSelectizeInput( # funcao que atualiza um SelectizeInput
       session, # sessao
-      "columns", # Id do SelecizeInput que sera atualizado
-      choices = outVar()) # lista de opcoes. No caso, nomes das variaveis do arquivo carregado pelo usuario
+      "columnY1", # Id do SelecizeInput que sera atualizado
+      choices = c("Selecione a coluna"="",outVar() ) ) # lista de opcoes. No caso, nomes das variaveis do arquivo carregado pelo usuario
     })
+  
+  observe({ # Com observe iremos atualizar a lista de variaveis em selectizeInput
+    
+    updateSelectizeInput( # funcao que atualiza um SelectizeInput
+      session, # sessao
+      "columnYj", # Id do SelecizeInput que sera atualizado
+      choices = c("Selecione a coluna"="",outVar() ) ) # lista de opcoes. No caso, nomes das variaveis do arquivo carregado pelo usuario
+  })
   
   observe({ # este observe muda a tab selecionada para dados
     # caso o usuário carregue os dados (clicando no action button Load)
@@ -114,7 +122,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
 
     if(input$run) # se o botao input#subset for apertado
     {
-    subset_data <- raw_data[, input$columns] # filtar colunas com base em input$columns
+    subset_data <- raw_data[, c(input$columnY1, input$columnYj) ] # filtar colunas com base em input$columns
     }
     
     vals$keeprows = rep(TRUE, nrow(raw_data) )
@@ -150,7 +158,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
     df <- df[vals$keeprows, ]
     
-    x <- FdeGraybill_(df, input$columns[1], input$columns[2], alpha = input$alpha)
+    x <- FdeGraybill_(df, input$columnY1, input$columnYj, alpha = input$alpha)
     
     x
     
@@ -188,7 +196,7 @@ shinyServer( function(input, output,session) { # como estamos usando reactive, c
     
     # utilizando o pacote ggplot2, renderizamos um grafico de dispersao simples
     
-    graph <- ggplot(data = keep, aes_string(input$columns[1], input$columns[2]) ) + # dados e variaveis utilizadas
+    graph <- ggplot(data = keep, aes_string(input$columnY1, input$columnYj) ) + # dados e variaveis utilizadas
       geom_smooth(method="lm", colour="red",se=F) + # linha do ajuste
       geom_point(size=5) +
       geom_point(data=exclude, fill=NA,col="black",alpha=0.75,shape=21, size=5) + # grafico de dispersao
