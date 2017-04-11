@@ -44,15 +44,21 @@ shinyUI( # cria a interface de usuario
           "Carregue o arquivo"),  # nome que sera mostrado na UI
         
         # texto mostrado na UI
-        helpText("Selecione as colunas que seram utilizadas no teste, sendo primeiro o Valor Padrão, e segundo o Valor Proposto:"),
+        h4("Selecione as colunas que serão utilizadas no teste:"),
         
         selectizeInput( # cria uma lista de opcoes em que o usuario pode clicar
-          'columns', # Id
-          "selecione as colunas:", # nome que sera mostrado na UI
-          choices = "", # como as opcoes serao atualizadas de acordo com o arquivo que o usuario insere, deixamos este campo em branco
-          multiple = TRUE,  # permite mais de uma opcao ser selecionada
-          options = list(maxItems = 2)  ), # limita o numero de variaveis que o usuario pode selecionar
+          'columnY1', # Id
+          "selecione a coluna do valor padrão:", # nome que sera mostrado na UI
+          choices = "" # como as opcoes serao atualizadas de acordo com o arquivo que o usuario insere, deixamos este campo em branco
+                       ), 
+
+        selectizeInput( # cria uma lista de opcoes em que o usuario pode clicar
+          'columnYj', # Id
+          "selecione a coluna do valor proposto:", # nome que sera mostrado na UI
+          choices = "" # como as opcoes serao atualizadas de acordo com o arquivo que o usuario insere, deixamos este campo em branco
+                      ), 
         
+                
         sliderInput("alpha","Selecione o nivel de significância", 0.01, 0.1, 0.05, 0.01),
         
         
@@ -69,7 +75,11 @@ shinyUI( # cria a interface de usuario
           id = "tabs", # id, caso ele seja referenciado em output
           tabPanel("Intro",  includeMarkdown("about.md") )  , # painel para um arquivo markdown que foi criado separadamente, contendo texto.
           tabPanel("Dados",    DT::dataTableOutput("data") )        , # painel para #output$data; mostra os dados inseridos pelo usuario
-          tabPanel("Grafico",   plotly::plotlyOutput("plot") , downloadButton('downloadPlot', 'Download') )             , # painel para #output$plot; mostra o grafico gerado pelo ggplot
+          tabPanel("Análise Gráfica",   plotOutput("plot1",click = "plot1_click") , 
+                   htmlOutput("texto", inline = T),
+                   actionButton("exclude_reset", "Resetar pontos"),
+                   downloadButton('downloadPlot', 'Download'),
+                  DT::dataTableOutput("exludeded_rows")  ) , # painel para #output$plot; mostra o grafico gerado pelo ggplot
           tabPanel("Resultado", DT::dataTableOutput("tablegraybill", "70%"),  downloadButton('downloadData', 'Download') )      # painel para #output$tabgraybill; mostra o resultado do teste F de Graybill
           
         )#, # fecha tabsetPanel

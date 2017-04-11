@@ -45,8 +45,6 @@ knitr::opts_chunk$set(tidy.opts=list(width.cutoff=55),tidy=TRUE, warning = F)
 
 ## instala-se o pacote ggplot2, para a criacao dos graficos.
 #install.pachages("ggplot2", dependencies = T)
-#install.packages("GridExtra")
-#install.packages("grid")
 
 ## Carregar os Pacotes 
 library(readxl)
@@ -234,9 +232,7 @@ graph <- ggplot(data = dados, aes(x = Y1, y = Yj)) +
        title = "Comparação \n (Método proposto e alternativo)") +
   geom_smooth(method="lm", colour="red") +
   theme(axis.title=element_text(size=12, face= "bold" ), 
-        plot.title=element_text(size=16,face="bold", hjust = 0.5) ) #+
- # coord_cartesian(xlim = c(0, max(dados$Y1 + 0.3)) , # tamanho dos eixos pode
-#                  ylim = c(0, max(dados$Yj + 0.3))) # ser alterado com estes comandos
+        plot.title=element_text(size=16,face="bold", hjust = 0.5) ) 
 
 graph
 
