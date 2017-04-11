@@ -1,7 +1,5 @@
-
 # Custom
 documents
-Graybill_R.Rproj
 graybill_app/rsconnect
 graybill_script_OLD.R
 graph.png
@@ -11,6 +9,7 @@ Tab_Res_Simp.csv
 FdeGraybill_.R
 FdeGraybill.R
 graybill_fun.R
+
 
 # History files
 .Rhistory
@@ -31,6 +30,9 @@ graybill_fun.R
 # RStudio files
 .Rproj.user/
 
+=======
+
+>>>>>>> refs/heads/dplyr_programming
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
@@ -89,5 +91,3 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 .Rproj.user
-
-
